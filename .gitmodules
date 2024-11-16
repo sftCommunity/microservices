@@ -4,3 +4,6 @@
 [submodule "products-microservice"]
 	path = products-microservice
 	url = https://github.com/sftCommunity/products-microservice.git
+[submodule "orders-microservice"]
+	path = orders-microservice
+	url = https://github.com/sftCommunity/orders-microservice.git
