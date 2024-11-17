@@ -7,6 +7,8 @@ services:
       - 8222:8222
 
   gateway:
+    depends_on:
+      - nats-server
     build: ./gateway
     ports:
       - ${GATEWAY_PORT}:${GATEWAY_PORT}
@@ -16,10 +18,23 @@ services:
     environment:
       - PORT=3000
       - NATS_SERVERS=nats://nats-server:4222
+
+  auth-microservice:
     depends_on:
       - nats-server
+    build: ./auth-microservice
+    volumes:
+      - ./auth-microservice/src:/usr/src/app/src
+    command: npm run start:dev
+    environment:
+      - PORT=3004
+      - NATS_SERVERS=nats://nats-server:4222
+      - DATABASE_URL=${AUTH_DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
 
   products-microservice:
+    depends_on:
+      - nats-server
     build: ./products-microservice
     volumes:
       - ./products-microservice/src:/usr/src/app/src
