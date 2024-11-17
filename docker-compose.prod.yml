@@ -1,0 +1,69 @@
+version: "3.8"
+
+services:
+  nats-server:
+    image: nats:latest
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile.prod
+    image: gateway:production
+    ports:
+      - ${GATEWAY_PORT}:${GATEWAY_PORT}
+    environment:
+      - PORT=${GATEWAY_PORT}
+      - NATS_SERVERS=nats://nats-server:4222
+
+
+  auth-microservice:
+    build:
+      context: ./auth-microservice
+      dockerfile: Dockerfile.prod
+    image: auth-microservice:production
+    environment:
+      - PORT=3000
+      - NATS_SERVERS=nats://nats-server:4222
+      - DATABASE_URL=${AUTH_DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+
+  products-microservice:
+    depends_on:
+      - nats-server
+    build:
+      context: ./products-microservice
+      dockerfile: Dockerfile.prod
+    image: products-microservice:production
+    volumes:
+      - ./products-microservice/src:/usr/src/app/src
+    environment:
+      - PORT=3001
+      - NATS_SERVERS=nats://nats-server:4222
+      - DATABASE_URL=file:./dev.db
+
+  orders-microservice:
+    build:
+      context: ./orders-microservice
+      dockerfile: Dockerfile.prod
+      args:
+        ORDERS_DATABASE_URL: ${ORDERS_DATABASE_URL}
+    image: orders-microservice:production
+    volumes:
+      - ./orders-microservice/src:/usr/src/app/src
+    environment:
+      - PORT=3000
+      - DATABASE_URL=${ORDERS_DATABASE_URL}
+      - NATS_SERVERS=nats://nats-server:4222
+
+  # orders-database:
+  #   container_name: orders-database
+  #   image: postgres:16.2
+  #   restart: always
+  #   volumes:
+  #     - ./orders-microservice/postgres:/var/lib/postgresql/data
+  #   ports:
+  #     - 5432:5432
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: orders-database

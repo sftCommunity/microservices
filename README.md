@@ -1,5 +1,7 @@
 ### Steps to Create Git Submodules
 
+## Development
+
 1. Clone the repository to your local machine
 ```
 git clone https://github.com/sftCommunity/microservices.git
@@ -29,3 +31,9 @@ When working with a repository that has submodules, **first update and push** in
 
 If done in reverse order, submodule references in the main repository will be lost, and you'll have to resolve conflicts.
 
+## Production
+
+execute command 
+```
+docker compose -f docker-compose.prod.yml build
+```
