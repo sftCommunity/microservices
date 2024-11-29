@@ -1,3 +1,9 @@
+<p align="center">
+  About
+A streamlined tool for bootstrapping and managing NestJS microservices in a distributed system. Features include service discovery, container orchestration, and environment setup with Docker support.
+</p>
+
+
 ### Steps to Create Git Submodules
 
 ## Development
